@@ -1,37 +1,43 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <array>
 
 using namespace std;
 
+// Функция для создания файла и записи названий предметов
+void createFile(const string& day, const array<string, 5>& subjects) {
+    ofstream file(day + ".txt"); // Используем ofstream вместо fstream, если только запись
+    if (!file) { // Проверяем, был ли файл открыт успешно
+        cerr << "Ошибка при открытии файла: " << day << ".txt" << endl;
+        return;
+    }
+    
+    for (const auto& subject : subjects) {
+        file << subject << endl; // Записываем каждый предмет на новой строке
+    }
+}
+
 int main() {
     // Шаблоны дней недели
-    const string days[7] = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+    const array<string, 7> days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
     // Шаблоны предметов
-    const string subjects[5] = { "Math", "Physics", "Chemistry", "Biology", "History" };
+    const array<string, 5> subjects = {"Math", "Physics", "Chemistry", "Biology", "History"};
 
     // Создание текстовых файлов для каждого дня недели
-    for (int i = 0; i < 7; ++i) {
-        // Открываем файл с именем дня недели (например, "Monday.txt")
-        fstream file(days[i] + ".txt");
-        // Записываем названия предметов в файл
-        for (const auto& subject : subjects) {
-            file << subject << endl; // Записываем каждый предмет на новой строке
-        }
-        file.close(); // Закрываем файл после записи
+    for (const auto& day : days) {
+        createFile(day, subjects);
     }
 
     // Открываем созданные файлы в текстовом редакторе
     for (const auto& day : days) {
-        // Формируем команду для открытия файла с помощью
-        string command =  day + ".txt";
-        // Выполняем команду, открывая файл
-        system(command.c_str());
+        string command = day + ".txt"; // Формируем команду для открытия файла
+        system(command.c_str()); // Выполняем команду, открывая файл
     }
 
     return 0; // Завершаем программу
 }
-/*-
+
 -
 -
 -
