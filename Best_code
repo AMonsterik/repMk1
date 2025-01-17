@@ -1,0 +1,107 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+string translator(int x) { 
+    // дни недели; функция переводит цифру в день недели
+    switch (x) {
+        case 0: return "monday";
+        case 1: return "tuesday";
+        case 2: return "wednesday"; // исправлено написание
+        case 3: return "thursday";
+        case 4: return "friday";
+        case 5: return "saturday"; // исправлено написание
+        case 6: return "sunday";
+        default: return "";
+    }
+}
+int inputNumberOfLessons(int day) {
+    char num;
+    int number_of_lessons;
+    while (true) { 
+        cout << "Enter number of lessons on " << translator(day) << " (0-5): ";
+        cin >> num;
+        if (num >= '0' && num <= '5') {
+            number_of_lessons = num - '0'; // преобразование символа в цифру
+            return number_of_lessons;
+        } else {
+            cout << "Invalid input! Please enter a number between 0 and 5.\n";
+        }
+    }
+}
+string create_table() { 
+    // создает строку, хранящую расписание
+    string schedule;
+    for (int i = 0; i < 5; i++) {
+        int number_of_lessons = inputNumberOfLessons(i);
+        schedule += "#"; // начало дня
+
+        for (int j = 0; j < number_of_lessons; j++) {
+            cout << "Enter " << j + 1 << " lesson: ";
+            string lesson;
+            cin >> lesson;
+            schedule += "!" + lesson; // конец урока
+        }
+    }
+    return schedule;
+}
+
+void create_file(const string& schedule) { 
+    // создает файл и записывает туда расписание из строки
+    ofstream off("table.txt");
+    if (!off) {
+        cerr << "Error opening file for writing.\n";
+        exit(1);
+    }
+    off << schedule << "##WEEKEND"; 
+    off.close();
+}
+
+void read_file() { 
+    // выводит расписание из файла в консоль 
+    ifstream inn("table.txt");
+    if (!inn) {
+        cerr << "Error opening file for reading.\n";
+        exit(1);
+    }
+
+    char symbol; 
+    int day = 0;
+    int lesson = 1;
+
+    while (inn.get(symbol)) { 
+        if (symbol == '#' && inn.peek() == '#') { // два знака "#" обозначают выходной
+            cout << "\nSchedule for " << translator(day) << ":\nWEEKEND\n";
+            day++;
+        } else if (symbol == '#') {
+            cout << "\nSchedule for " << translator(day) << ":\n";
+            lesson = 1; // сбрасываем номер урока для нового дня
+            day++;
+        } else if (symbol == '!') {
+            cout << "Lesson " << lesson << ": ";
+            lesson++;
+        } else {
+            cout << symbol;
+        }
+    }
+    inn.close();
+}
+
+int main() {
+    string schedule; // строка, хранящая расписание
+    while (true) {
+        cout << "\nEnter 'EDIT' to edit timetable\nEnter 'PRINT' to see timetable\n\n";
+        string action;
+        cin >> action;
+
+        if (action == "EDIT") {
+            schedule = create_table();
+            create_file(schedule);
+        } else if (action == "PRINT") {
+            read_file();
+        } else {
+            cout << "Invalid command! Please enter 'EDIT' or 'PRINT'.\n";
+        }
+    }
+}
