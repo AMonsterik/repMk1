@@ -1,0 +1,121 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+// Функция для перевода цифры в название дня недели
+string translator(int x) { 
+    switch (x) {
+        case 0: return "monday";
+        case 1: return "tuesday";
+        case 2: return "wednesday"; 
+        case 3: return "thursday";
+        case 4: return "friday";
+        case 5: return "saturday"; 
+        case 6: return "sunday";
+        default: return "";
+    }
+}
+
+// Функция для ввода количества уроков на день
+int inputNumberOfLessons(int day) {
+    char num; // переменная для хранения ввода
+    int number_of_lessons; // переменная для хранения количества уроков
+
+    while (true) { 
+        // Запросим количество уроков для соответствующего дня
+        cout << "Enter number of lessons on " << translator(day) << " (0-5): ";
+        cin >> num; // считываем символ
+
+        // Проверяем, является ли символ цифрой от 0 до 5
+        if (num >= '0' && num <= '5') {
+            number_of_lessons = num - '0'; // преобразуем символ в цифру
+            return number_of_lessons; // возвращаем количество уроков
+        } else {
+            cout << "Invalid input! Please enter a number between 0 and 5.\n"; // сообщение об ошибке
+        }
+    }
+}
+
+// Функция для создания расписания
+string create_table() { 
+    string schedule; // строка для хранения расписания
+    int total_lessons = 0; // переменная для подсчета общего количества уроков
+
+    for (int i = 0; i < 5; i++) { // цикл по дням недели
+        int number_of_lessons = inputNumberOfLessons(i); // получаем количество уроков для текущего дня
+        total_lessons += number_of_lessons; // добавляем к общему количеству уроков
+        schedule += "#"; // начало нового дня
+
+        for (int j = 0; j < number_of_lessons; j++) { // цикл по урокам
+            cout << "Enter " << j + 1 << " lesson: "; // запрос на ввод названия урока
+            string lesson;
+            cin >> lesson; // считываем название урока
+            schedule += "!" + lesson; // добавляем урок в расписание с символом конца урока
+        }
+    }
+
+    // Выводим общее количество уроков в неделю
+    cout << "Total number of lessons in the week: " << total_lessons << endl;
+    return schedule; // возвращаем созданное расписание
+}
+
+// Функция для создания файла и записи расписания
+void create_file(const string& schedule) { 
+    ofstream off("table.txt"); // открываем файл для записи
+    if (!off) { // проверка на успешное открытие файла
+        cerr << "Error opening file for writing.\n"; // сообщение об ошибке
+        exit(1); // завершение программы с ошибкой
+    }
+    off << schedule << "##WEEKEND"; // записываем расписание и обозначение выходных
+    off.close(); // закрываем файл
+}
+
+// Функция для чтения и вывода расписания из файла
+void read_file() { 
+    ifstream inn("table.txt"); // открываем файл для чтения
+    if (!inn) { // проверка на успешное открытие файла
+        cerr << "Error opening file for reading.\n"; // сообщение об ошибке
+        exit(1); // завершение программы с ошибкой
+    }
+
+    char symbol; 
+    int day = 0; // счетчик дней
+    int lesson = 1; // счетчик уроков
+
+    while (inn.get(symbol)) { // считываем символы из файла
+        if (symbol == '#' && inn.peek() == '#') { // обнаружили выходной 
+            cout << "\nSchedule for " << translator(day) << ":\nWEEKEND\n";
+            day++; // переходим на следующий день
+        } else if (symbol == '#') { // новый день с уроками
+            cout << "\nSchedule for " << translator(day) << ":\n";
+            lesson = 1; // сбрасываем номер урока для нового дня
+            day++; // переходим на следующий день
+        } else if (symbol == '!') { // начало нового урока
+            cout << "Lesson " << lesson++ << ": "; // выводим номер урока
+        } else {
+            cout << symbol; // выводим символ, если это не специальный символ
+        }
+    }
+    inn.close(); // закрываем файл
+}
+
+// Основная функция программы
+int main() {
+    string schedule; // строка, хранящая расписание
+    while (true) { // бесконечный цикл для ввода действий
+        cout << "\nEnter 'EDIT' to edit timetable\nEnter 'PRINT' to see timetable\n\n"; // запрос выбора действия
+        string action; // переменная для хранения действия
+        cin >> action; // считываем действие
+
+        if (action == "EDIT") { // если пользователь хочет редактировать расписание
+            schedule = create_table(); // создаем новое расписание
+            create_file(schedule); // записываем его в файл
+        } else if (action == "PRINT") { // если пользователь хочет просмотреть расписание
+            read_file(); // читаем и выводим расписание из файла
+        } else {
+            cout << "Invalid command! Please enter 'EDIT' or 'PRINT'.\n"; // сообщение об ошибке
+        }
+    }
+}
