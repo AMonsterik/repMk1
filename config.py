@@ -1,9 +1,8 @@
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 
+load_dotenv(dotenv_path='configs/.env')
 
-load_dotenv('configs/.env')
-
-SHEET_ID = os.getenv('SHEET_ID')
-FLODER_NAME = os.getenv('FLODER_NAME')#
-DRIVE_ID  = os.getenv('DRIVE_ID')
+sheet_id = os.getenv('SHEET_ID')
+folder_name = os.getenv('FOLDER_NAME')
+drive_id = os.getenv('DRIVE_ID')
