@@ -1,18 +1,18 @@
 #include <iostream>
 #include <random>
-#include <chrono>
 
 using namespace std;
 
 int main() {
-    random_device rd;
-    mt19937 gen(rd());
- uniform_int_distribution<> distrib(1, 100);   
-    for (int i = 0; i < 10; ++i) {
-        int randomNumber = distrib(gen);
-        cout << randomNumber << " ";
-    }
-    cout << endl;
+    random_device rd; // Seed for the random number generator
+    mt19937 gen(rd()); // Mersenne Twister generator
+    uniform_int_distribution<> distrib(1, 100); // Distribution in range [1, 100]
 
-    return 0;
+    for (int i = 0; i < 10; ++i) {
+        int randomNumber = distrib(gen); // Generate random number
+        cout << randomNumber << " "; // Print random number
+    }
+    cout << endl; // Print newline at the end
+
+    return 0; // Exit program
 }
