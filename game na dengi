@@ -1,63 +1,67 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-
+#include <limits>
+#include <locale>
 using namespace std;
-
 int main() {
-    srand(static_cast<unsigned int>(time(0))); // Инициализация генератора случайных чисел
+    // Инициализация генератора случайных чисел
+    srand(static_cast<unsigned int>(time(0)));
+    // Установка русской локализации
+    setlocale(LC_ALL, "rus");
     int bitcoins = 1000; // Начальное количество биткоинов
-    setlocale(LC_ALL, "Rus");
-
     cout << "Добро пожаловать в игру с кубиками!" << endl;
     cout << "У вас есть " << bitcoins << " биткоинов." << endl;
-
     while (bitcoins > 0) {
         int bet;
-        cout << "Введите вашу ставку (доступно: " << bitcoins << " биткоинов): ";
-        cin >> bet;
-
-        // Проверка на корректность ставки
-        if (bet <= 0 || bet > bitcoins) {
-            cout << "Некорректная ставка. Попробуйте снова." << endl;
-            continue;
+        bool validBet = false;
+        // Цикл для ввода корректной ставки
+        while (!validBet) {
+            cout << "Введите вашу ставку (доступно: " << bitcoins << " биткоинов): ";
+            if (!(cin >> bet)) {
+                cin.clear(); // Очистка потока ввода
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Игнорирование неверных символов
+                cout << "Ошибка ввода. Пожалуйста, введите целое число." << endl;
+            } else if (bet <= 0 || bet > bitcoins) {
+                cout << "Ставка должна быть положительной и не превышать доступные средства." << endl;
+            } else {
+                validBet = true;
+            }
         }
-
         int target;
-        cout << "Введите число, на которое вы ставите (от 2 до 12): ";
-        cin >> target;
-
-        // Проверка на корректность введенного числа
-        if (target < 2 || target > 12) {
-            cout << "Некорректное число. Оно должно быть от 2 до 12." << endl;
-            continue;
+        bool validTarget = false;
+        // Цикл для ввода целевого числа
+        while (!validTarget) {
+            cout << "Введите число, на которое вы ставите (от 2 до 12): ";
+            if (!(cin >> target)) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Ошибка ввода. Пожалуйста, введите целое число." << endl;
+            } else if (target < 2 || target > 12) {
+                cout << "Целевое число должно быть от 2 до 12." << endl;
+            } else {
+                validTarget = true;
+            }
         }
-
         // Бросок кубиков
         int die1 = rand() % 6 + 1; // Кубик 1
         int die2 = rand() % 6 + 1; // Кубик 2
-        int sum = die1 + die2; // Сумма значений кубиков
-
+        int sum = die1 + die2;     // Сумма значений кубиков
         cout << "Вы бросили кубики: " << die1 << " и " << die2 << ". Сумма: " << sum << endl;
-
         // Проверка условий выигрыша
         if (sum >= target) {
             bitcoins += bet; // Увеличение биткоинов вдвое
             cout << "Вы выиграли! Теперь у вас " << bitcoins << " биткоинов." << endl;
-        }
-        else {
+        } else {
             bitcoins -= bet; // Уменьшение биткоинов на ставку
             cout << "Вы проиграли! Теперь у вас " << bitcoins << " биткоинов." << endl;
         }
-
         // Проверка на окончание игры
         if (bitcoins <= 0) {
             cout << "Вы проиграли все свои биткоины. Игра окончена!" << endl;
+            break;
         }
-        else {
-            cout << endl; // Пустая строка для удобства чтения
-        }
+        cout << endl; // Пустая строка для удобства чтения
     }
-
     return 0;
 }
